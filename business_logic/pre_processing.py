@@ -11,6 +11,7 @@ class Exchange:
 	
 
 	def process_exchange_data(self, df):
+    	df.drop(["TimeStampEpoch", "Exchange"], axis=1, inplace=True)
 		df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
 		nested_dict = {}
 		temp_dict = df.to_dict(orient='index')
