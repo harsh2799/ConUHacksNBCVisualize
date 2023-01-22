@@ -1,6 +1,6 @@
 from flask import Flask, render_template, make_response
 from flask_restful import Api, Resource
-# import json
+import json	
 # import firebase_admin
 # from firebase_admin import credentials, db, firestore
 from business_logic.pre_processing import Exchange
@@ -19,13 +19,14 @@ class Temp(Resource):
 		return make_response(render_template('index.html'))
 
 	def post(self):
-		return data
+		print("Here Hhere")
+		return json.dumps(data)
 
 api.add_resource(Temp, '/')
 
 if __name__ == '__main__':
 	data = Exchange().process_index()
-	print(data['tsx'])
+	# print(data['tsx'])
 	app.run(
 		host='localhost',
 		port=5000,

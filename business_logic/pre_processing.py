@@ -6,13 +6,13 @@ indices = [
 			{"name": "aequitas", "filename": "AequitasData"}
 		]
 
-
-
 class Exchange:
 
 	def process_exchange_data(self, df):
-    	df.drop(["TimeStampEpoch", "Exchange"], axis=1, inplace=True)
+		df.drop(["TimeStampEpoch", "Exchange"], axis=1, inplace=True)
+		df["TimeStamp"] = df["TimeStamp"].astype(str)
 		df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+		df.fillna("", inplace=True)
 		nested_dict = {}
 		temp_dict = df.to_dict(orient='index')
 		for key1, value1 in temp_dict.items():
@@ -21,10 +21,8 @@ class Exchange:
 			if key1[1] not in nested_dict[key1[0]]:
 				nested_dict[key1[0]][key1[1]] = {}
 			nested_dict[key1[0]][key1[1]][key1[2]] = value1
-		
+		print("Done")
 		return nested_dict
-		# for key in nested_dict.keys():
-		#     db_ref.document(name).set({key: nested_dict[key]}, merge=True)
 
 	def process_index(self):
 		global indices
@@ -34,23 +32,23 @@ class Exchange:
 
 		return data
 	
-	def get_trade(df):
-    	"""Get the stocks with most trades"""
-        df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+	def get_trade(self, df):
+		"""Get the stocks with most trades"""
+		df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
 		df = df.reset_index(level=2)
 		dict_ = df[df["MessageType"] == "Trade"].groupby(level=0).size().to_dict()
 		return dict(sorted(dict_.items(), key=lambda x: x[1], reverse=True)[:10])
 	
-	def most_requests(df):
-    	"""Get the stocks which are most requested"""
-        df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+	def most_requests(self, df):
+		"""Get the stocks which are most requested"""
+		df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
 		df = df.reset_index(level=2)
 		dict_ = df[df["MessageType"] == "NewOrderRequest"].groupby(level=0).size().to_dict()
 		return dict(sorted(dict_.items(), key=lambda x: x[1], reverse=True)[:10])
 	
-	def canc_rate(df):
-    	"""Get the stocks whose cancellation rate is highest."""
-        df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+	def canc_rate(self, df):
+		"""Get the stocks whose cancellation rate is highest."""
+		df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
 		df = df.reset_index(level=2)
 		tot = df.groupby(level=0).size().to_dict()
 		canc = df[df["MessageType"] == "CancelRequest"].groupby(level=0).size().to_dict()
