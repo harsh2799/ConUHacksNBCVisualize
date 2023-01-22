@@ -60,6 +60,8 @@ class Exchange:
 		dict_ = df[df["MessageType"] == "Trade"].groupby(level=0).size().to_dict()
 		return dict(sorted(dict_.items(), key=lambda x: x[1], reverse=True)[:10])
 	
+	def most_requests(self, df):
+		"""Get the stocks which are most requested"""
 		# df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
 		df = df.reset_index(level=2)
 		dict_ = df[df["MessageType"] == "NewOrderRequest"].groupby(level=0).size().to_dict()
