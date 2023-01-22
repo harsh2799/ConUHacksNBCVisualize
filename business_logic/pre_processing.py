@@ -6,9 +6,9 @@ indices = [
 			{"name": "aequitas", "filename": "AequitasData"}
 		]
 
-class Exchange:
 
-	
+
+class Exchange:
 
 	def process_exchange_data(self, df):
     	df.drop(["TimeStampEpoch", "Exchange"], axis=1, inplace=True)
@@ -33,3 +33,26 @@ class Exchange:
 			data[index["name"]] = self.process_exchange_data(pd.read_json(f"D:\Git Repositories\ConUHacksNBCVisualize\static\Hackathon\Hackathon\{index['filename']}.json"))
 
 		return data
+	
+	def get_trade(df):
+    	"""Get the stocks with most trades"""
+        df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+		df = df.reset_index(level=2)
+		dict_ = df[df["MessageType"] == "Trade"].groupby(level=0).size().to_dict()
+		return dict(sorted(dict_.items(), key=lambda x: x[1], reverse=True)[:10])
+	
+	def most_requests(df):
+    	"""Get the stocks which are most requested"""
+        df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+		df = df.reset_index(level=2)
+		dict_ = df[df["MessageType"] == "NewOrderRequest"].groupby(level=0).size().to_dict()
+		return dict(sorted(dict_.items(), key=lambda x: x[1], reverse=True)[:10])
+	
+	def canc_rate(df):
+    	"""Get the stocks whose cancellation rate is highest."""
+        df = df.groupby(["Symbol", "OrderID", "MessageType"]).first()
+		df = df.reset_index(level=2)
+		tot = df.groupby(level=0).size().to_dict()
+		canc = df[df["MessageType"] == "CancelRequest"].groupby(level=0).size().to_dict()
+		result = {key: (canc[key]*100)/tot[key] for key in canc.keys()}
+		return dict(sorted(result.items(), key=lambda x: x[1], reverse=True)[:10])
