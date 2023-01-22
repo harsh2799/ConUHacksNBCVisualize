@@ -6,15 +6,85 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Visualize NBC</title>
 
-	<link href="../static/css/style.css" ref="stylesheet" />
+	<link href="../static/css/style.css" rel="stylesheet" />
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 </head>
 <body ng-controller="myController">
+	<div class="header">
+		NBC Visualization - ConUHacks VII
+	</div>
+	<div class="exchange-container">
+		<div ng-repeat="exchange in all_exchanges" class="exchange {a current_exchange == exchange?'exchange-active': '' a}" ng-click="set_current_exchange($index)">{a exchange a}</div>
+	</div>
+
+	<div class="stock-container">
+		<div class="stock-container-inner">
+			<div class="stock {a current_stock == key?'stock-active': '' a}"  ng-click="set_current_stock(key)" ng-repeat="(key, value) in all_data[current_exchange]">{a key a}</div>
+		</div>
+	</div>
+
+	<div class="stock-details-container" ng-show="current_stock != ''">
+		
+		<div class="stock-trend">
+			<div class="trend-container">
+				<div class="trend-title">Total Requests</div>
+				<div class="number">{a total_data[current_exchange][current_stock] a}</div>
+			</div>
+			<div class="trend-container">
+				<div class="trend-title">Traded</div>
+				<div class="number">{a trade_data[current_exchange][current_stock] || 0 a}</div>
+			</div>
+			<div class="trend-container">
+				<div class="trend-title">Cancelled</div>
+				<div class="number">{a Math.round(cancelled_data[current_exchange][current_stock]) a}</div>
+			</div>
+			<div class="btn btn-primary anomaly-btn" ng-click="show_anomaly_table()">See Anomalies</div>
+		</div>
+		<div class="show-chart" id="chart"></div>
+		<div class="anomaly-table" ng-show="view_anomaly && anomaly != []">
+			
+			<div class="table-wrap">
+				<div class="table-grid">
+					<div class="table-header table-row">
+						<div class="fixed-col">Order ID</div>
+						<div>NewOrderRequest</div>
+						<div>NewOrderAcknowledged</div>
+						<div>Trade</div>
+						<div>CancelRequest</div>
+						<div>CancelRequestAcknowledged</div>
+						<div>Cancelled</div>
+					</div>
+					<div class="table-row"  ng-repeat="anomaly in anomaly_list">
+						<div class="fixed-col">{a anomaly a}</div>
+						<div><i class="fas {a all_data[current_exchange][current_stock][anomaly]['NewOrderRequest']?'fa-check':'fa-times' a}"></i></div>
+						<div><i class="fas {a all_data[current_exchange][current_stock][anomaly]['NewOrderAcknowledged']?'fa-check':'fa-times' a}""></i></div>
+						<div><i class="fas {a all_data[current_exchange][current_stock][anomaly]['Trade']?'fa-check':'fa-times' a}""></i></div>
+						<div><i class="fas {a all_data[current_exchange][current_stock][anomaly]['CancelRequest']?'fa-check':'fa-times' a}""></i></div>
+						<div><i class="fas {a all_data[current_exchange][current_stock][anomaly]['CancelRequestAcknowledged']?'fa-check':'fa-times' a}""></i></div>
+						<div><i class="fas {a all_data[current_exchange][current_stock][anomaly]['Cancelled']?'fa-check':'fa-times' a}""></i></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="all-stock-details" ng-show="current_stock == ''">
+		ALL STOCK DATA
+	</div>
+
+
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js" integrity="sha512-KZmyTq3PLx9EZl0RHShHQuXtrvdJ+m35tuOiwlcZfs/rE7NZv29ygNA8SFCkMXTnYZQK2OX0Gm2qKGfvWEtRXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	
 	<script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
 	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
 	<script src="../static/js/index.js"></script>
 
-	{a message a}
+
 </body>
 </html>

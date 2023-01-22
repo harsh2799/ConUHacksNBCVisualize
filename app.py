@@ -13,19 +13,27 @@ from business_logic.pre_processing import Exchange
 app = Flask(__name__)
 api = Api(app)
 
+processed_data = Exchange()
+
 class Temp(Resource):
 	def get(self):
 		print("Get")
 		return make_response(render_template('index.html'))
 
 	def post(self):
-		print("Here Hhere")
-		return json.dumps(data)
+		# print("Here Hhere")
+		return json.dumps({
+			"exchanges": ["alpha", "aequitas", "tsx"],
+			"json_data": processed_data.json_data,
+			"trade_data": processed_data.trade_dict,
+			"cancelled_data": processed_data.cancelled_dict,
+			"total_data": processed_data.request_dict
+		})
 
 api.add_resource(Temp, '/')
 
 if __name__ == '__main__':
-	data = Exchange().process_index()
+	
 	# print(data['tsx'])
 	app.run(
 		host='localhost',
