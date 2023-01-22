@@ -91,12 +91,15 @@ ngApp.controller('myController', function ($scope, $http) {
         
                 
         for(key in cs){
-          if (cs[key]["NewOrderRequest"]["OrderPrice"])
+          if (cs[key]["NewOrderRequest"] && cs[key]["NewOrderRequest"]["OrderPrice"]){
             price_list.push(cs[key]["NewOrderRequest"]["OrderPrice"])
+            time_list.push(new Date(cs[key]["NewOrderRequest"]["TimeStamp"]))
+        }
           else{
             price_list.push(price_list[price_list.length - 1])
+            time_list.push(new Date(time_list[time_list.length - 1]));
           }
-            time_list.push(new Date(cs[key]["NewOrderRequest"]["TimeStamp"]));
+            
         }
         console.log(cs);
 
