@@ -33,6 +33,7 @@ ngApp.controller('myController', function ($scope, $http) {
               $scope.trade_data = data['trade_data'];
               $scope.cancelled_data = data['cancelled_data'];
               $scope.total_data = data['total_data'];
+              $scope.show_topstocks_chart();
             }, function errorCallback(response) {
               console.log(response);
             });
@@ -42,6 +43,7 @@ ngApp.controller('myController', function ($scope, $http) {
 
     $scope.set_current_exchange = function(index) {
       $scope.view_anomaly = false;
+      $scope.show_topstocks_chart();
       if ($scope.current_exchange !== $scope.all_exchanges[index]) {
         $scope.current_exchange = $scope.all_exchanges[index];
         $scope.current_stock = '';
@@ -86,9 +88,15 @@ ngApp.controller('myController', function ($scope, $http) {
 
         let price_list = [];
         let time_list = [];
+        
+                
         for(key in cs){
-          price_list.push(cs[key]["NewOrderRequest"]["OrderPrice"])
-          time_list.push(cs[key]["NewOrderRequest"]["TimeStamp"])
+          if (cs[key]["NewOrderRequest"]["OrderPrice"])
+            price_list.push(cs[key]["NewOrderRequest"]["OrderPrice"])
+          else{
+            price_list.push(price_list[price_list.length - 1])
+          }
+            time_list.push(new Date(cs[key]["NewOrderRequest"]["TimeStamp"]));
         }
         console.log(cs);
 
@@ -105,8 +113,16 @@ ngApp.controller('myController', function ($scope, $http) {
            'Pinch the chart to zoom in'
           },
           xAxis : {
-           type: 'datetime',
-           minRange: 14 * 24 * 3600000 // fourteen days
+            categories: time_list,
+            title: {
+                enabled: true,
+                text: 'Hours of the Day'
+            },
+            type: 'datetime',
+            dateTimeLabelFormats : {
+                hour: '%I %p',
+                minute: '%I:%M %p'
+            }
           },
           yAxis : {
            title: {
@@ -140,25 +156,74 @@ ngApp.controller('myController', function ($scope, $http) {
           },
           series: [{
            type: 'area',
-           name: 'Time vs Order Pricec',
-           pointInterval: 24 * 3600 * 1000,
-           pointStart: Date.UTC(2006, 0, 1),
+           name: 'Time vs Order Price',
            data: price_list
           }]
         });
-      
-      //     /**var json = {};
-      //     json.chart = chart;
-      //     json.title = title;
-      //     json.subtitle = subtitle;
-      //     json.legend = legend;
-      //     json.xAxis = xAxis;
-      //     json.yAxis = yAxis;  
-      //     json.series = series;
-      //     json.plotOptions = plotOptions;
-          // $('#lineChart').highcharts(json);*/
-      //   });
       };
+
+
+      $scope.show_topstocks_chart = function() {
+
+        let trending_data = [];
+
+        let data = $scope.all_data[$scope.current_exchange];
+
+        let keys = Object.keys(data);
+
+        // Then sort by using the keys to lookup the values in the original object:
+        keys.sort(function(a, b) { return keys[a] - keys[b] });
+        let count = 0;
+        for(stock in keys) {
+          if (++count == 10) {
+            break;
+          }
+        trending_data.push({
+          name:  keys[stock],
+          y: $scope.total_data[$scope.current_exchange][keys[stock]]
+        })
+
+        }
+
+        Highcharts.chart('all-stock-details', {
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+          },
+          title: {
+            text: 'Trending Stocks',
+            align: 'left'
+          },
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+          },
+          
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.y}'
+              }
+            }
+          },
+          series: [{
+            name: 'Stocks',
+            colorByPoint: true,
+            data: trending_data
+          }]
+        });
+      };
+
+
+
+
+
+
+
 
 
 });

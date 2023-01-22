@@ -42,6 +42,7 @@
 				<div class="number">{a Math.round(cancelled_data[current_exchange][current_stock]) a}</div>
 			</div>
 			<div class="btn btn-primary anomaly-btn" ng-click="show_anomaly_table()">See Anomalies</div>
+
 		</div>
 		<div class="show-chart" id="chart"></div>
 		<div class="anomaly-table" ng-show="view_anomaly && anomaly != []">
@@ -70,8 +71,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="all-stock-details" ng-show="current_stock == ''">
-		ALL STOCK DATA
+	<div class="all-stock-details" id="all-stock-details" ng-show="current_stock == ''">
+		
 	</div>
 
 

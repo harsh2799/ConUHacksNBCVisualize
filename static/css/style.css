@@ -211,3 +211,13 @@ body {
 .fa-check {
 	color: #0D6EFD;
 }
+
+.show-chart, .all-stock-details {
+	box-shadow: 0 1px 7px rgb(0 0 0 / 5%);
+    margin: 0 30px;
+    border-radius: 6px;
+}
+
+.all-stock-details {
+	margin-top: 20px;
+}
