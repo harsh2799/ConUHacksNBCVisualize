@@ -6,10 +6,7 @@ indices = [
 			{"name": "aequitas", "filename": "AequitasData"}
 		]
 
-
-
 class Exchange:
-
 	def __init__(self):
 		self.df = pd.DataFrame()
 		self.json_data, self.df = self.process_data()
